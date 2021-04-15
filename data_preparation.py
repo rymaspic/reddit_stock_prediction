@@ -1,9 +1,67 @@
 import csv
 
-GME_STOCK_DATA_PATH = 'data/GME.csv'
+RAW_GME_STOCK_DATA_PATH = 'data/GME.csv'
+PROCESSED_GME_STOCK_DATA_PATH = 'data/GME_processed.csv'
 
-# Data preparation for stock price
-with open(GME_STOCK_DATA_PATH, newline='') as csvfile:
+RAW_REDDIT_DATA_PATH = 'data/submissions_reddit.csv'
+PROCESSED_REDDIT_DATA_PATH = 'data/submissions_reddit_processed.csv'
+
+def stock_preparation():
+   # Data preparation for stock price
+   with open(RAW_GME_STOCK_DATA_PATH, newline='') as csvfile, open(PROCESSED_GME_STOCK_DATA_PATH, mode='w') as csv_output_file:
      reader = csv.DictReader(csvfile)
+     fieldnames = ['Date', 'Open', 'Close', 'Volumn', 'Label', 'Percentage']
+     writer = csv.DictWriter(csv_output_file, fieldnames=fieldnames)
+     writer.writeheader()
      for row in reader:
-        print(row['Date'], row['Open'], row['Close'])
+        date = row['Date']
+        open_price = row['Open']
+        close_price = row['Close']
+        volume = row['Volume']
+        percentage = (float(close_price) - float(open_price))/float(open_price)
+        #label = 1, stock price rises that day, label = 0, price decreses that day
+        label = 1 if (float(close_price) - float(open_price) > 0) else 0
+        writer.writerow({'Date': date, 'Open': open_price, 'Close': close_price, 'Volumn': volume, 'Label': label, 'Percentage': percentage})
+        #print(date, open_price, close_price, label)
+
+def reddit_feature_extraction():
+   with open(RAW_REDDIT_DATA_PATH, newline='') as csvfile, open(PROCESSED_REDDIT_DATA_PATH, mode='w') as csv_output_file:
+     reader = csv.DictReader(csvfile)
+     fieldnames = ['Date', 'Title', 'Post_Num', 'Avg_Upvote_Ratio', 'Keyword', 'Sentiment'] #todo: keyword and sentiment features
+     writer = csv.DictWriter(csv_output_file, fieldnames=fieldnames)
+     writer.writeheader()
+     post_count = 0
+     upvote_radio_count = 0
+     document_list = []
+     prev_date = '2021-01-01'
+     for row in reader:
+        date = row['created'].split()[0]
+        title = row['title']
+        upvote_ratio = row['upvote_ratio']
+        print(date, title)
+        if (date == prev_date):
+           document_list.append(title)
+           post_count = post_count + 1
+           upvote_radio_count = upvote_radio_count + float(upvote_ratio)
+        else:
+           writer.writerow({'Date': prev_date, 'Title': document_list, 'Post_Num': post_count, 'Avg_Upvote_Ratio': upvote_radio_count/post_count, 'Keyword': [], 'Sentiment': []})
+           post_count = 1
+           upvote_radio_count = float(upvote_ratio)
+           document_list = [title]
+           prev_date = date
+
+#todo-1
+#input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
+def keyword_feature(list_of_sentences):
+   return []
+
+#todo-2
+#input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
+def sentiment_feature(list_of_sentences):
+   return[]
+
+def main():
+    reddit_feature_extraction()
+
+if __name__ == "__main__":
+    main()
