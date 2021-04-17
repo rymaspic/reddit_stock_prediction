@@ -109,9 +109,9 @@ def keyword_count():
      #corpus = ["moon the moon the hello", "I love gme", "go to moon"]
      cv = CountVectorizer(analyzer='word', lowercase=True, stop_words='english')
      cv_fit = cv.fit_transform(corpus)
-     counts = pd.DataFrame(cv_fit.toarray(),columns=cv.get_feature_names(), low_memory=False, memory_map=True)
+     counts = pd.DataFrame(cv_fit.toarray(),columns=cv.get_feature_names())
      counts = counts.sum()
-     print(counts.sort_values(ascending=False).head(10))
+     print(counts.sort_values(ascending=False).head(0))
      print("start tfidf analysis ...")
      tfIdfVectorizer = TfidfVectorizer(use_idf=True,lowercase=True, stop_words='english')
      tfIdf = tfIdfVectorizer.fit_transform(corpus)
@@ -167,9 +167,9 @@ def data_integration():
     
 def main():
     keyword_count()
-    reddit_feature_extraction()
-    stock_preparation()
-    data_integration()
+    #reddit_feature_extraction()
+    #stock_preparation()
+    #data_integration()
 
 if __name__ == "__main__":
     main()
