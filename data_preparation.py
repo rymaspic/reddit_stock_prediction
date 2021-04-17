@@ -10,7 +10,7 @@ import re
 
 from datetime import datetime as dt
 
-csv.field_size_limit(sys.maxsize)
+csv.field_size_limit(2147483647)
 import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 
@@ -21,7 +21,6 @@ RAW_REDDIT_DATA_PATH = 'data/submissions_reddit.csv'
 PROCESSED_REDDIT_DATA_PATH = 'data/submissions_reddit_processed.csv'
 
 COMBO_DATA_PATH = 'data/combo.csv'
-stopwords = nltk.corpus.stopwords.words("english")
 nltk.download([
      "names",
      "stopwords",
@@ -32,6 +31,8 @@ nltk.download([
      "punkt",
      'vader_lexicon',
 ])
+stopwords = nltk.corpus.stopwords.words("english")
+
 
 def stock_preparation():
    # Data preparation for stock price
@@ -108,7 +109,7 @@ def keyword_count():
      #corpus = ["moon the moon the hello", "I love gme", "go to moon"]
      cv = CountVectorizer(analyzer='word', lowercase=True, stop_words='english')
      cv_fit = cv.fit_transform(corpus)
-     counts = pd.DataFrame(cv_fit.toarray(),columns=cv.get_feature_names())
+     counts = pd.DataFrame(cv_fit.toarray(),columns=cv.get_feature_names(), low_memory=False, memory_map=True)
      counts = counts.sum()
      print(counts.sort_values(ascending=False).head(10))
      print("start tfidf analysis ...")
@@ -136,7 +137,7 @@ def sentiment_feature(list_of_sentences):
 
 # function to integrate the processed stock dataset and reddit post dataset
 def data_integration():
-   with open(PROCESSED_GME_STOCK_DATA_PATH, newline='') as gme, open(PROCESSED_REDDIT_DATA_PATH, newline='') as feature, open(COMBO_DATA_PATH, mode='w') as csv_output_file:
+   with open(PROCESSED_GME_STOCK_DATA_PATH, newline='', encoding='utf-8') as gme, open(PROCESSED_REDDIT_DATA_PATH, newline='', encoding='utf-8') as feature, open(COMBO_DATA_PATH, mode='w', encoding='utf-8') as csv_output_file:
       reader_gme = csv.DictReader(gme)
       reader_feature = csv.DictReader(feature)
       fieldnames = ['Date', 'Post_Num', 'Avg_Upvote_Ratio', 'Keyword', 'Sentiment', 'Label']
@@ -165,8 +166,8 @@ def data_integration():
 
     
 def main():
-    #keyword_count()
-    #reddit_feature_extraction()
+    keyword_count()
+    reddit_feature_extraction()
     stock_preparation()
     data_integration()
 
