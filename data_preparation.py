@@ -22,6 +22,16 @@ PROCESSED_REDDIT_DATA_PATH = 'data/submissions_reddit_processed.csv'
 
 COMBO_DATA_PATH = 'data/combo.csv'
 stopwords = nltk.corpus.stopwords.words("english")
+nltk.download([
+     "names",
+     "stopwords",
+     "state_union",
+     "twitter_samples",
+     "movie_reviews",
+     "averaged_perceptron_tagger",
+     "punkt",
+     'vader_lexicon',
+])
 
 def stock_preparation():
    # Data preparation for stock price
