@@ -7,9 +7,12 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 import re
+
 from datetime import datetime as dt
 
 csv.field_size_limit(sys.maxsize)
+import nltk
+from nltk.sentiment import SentimentIntensityAnalyzer
 
 RAW_GME_STOCK_DATA_PATH = 'data/GME.csv'
 PROCESSED_GME_STOCK_DATA_PATH = 'data/GME_processed.csv'
@@ -18,6 +21,7 @@ RAW_REDDIT_DATA_PATH = 'data/submissions_reddit.csv'
 PROCESSED_REDDIT_DATA_PATH = 'data/submissions_reddit_processed.csv'
 
 COMBO_DATA_PATH = 'data/combo.csv'
+stopwords = nltk.corpus.stopwords.words("english")
 
 def stock_preparation():
    # Data preparation for stock price
@@ -38,7 +42,7 @@ def stock_preparation():
         #print(date, open_price, close_price, label)
 
 def reddit_feature_extraction():
-   with open(RAW_REDDIT_DATA_PATH, newline='') as csvfile, open(PROCESSED_REDDIT_DATA_PATH, mode='w') as csv_output_file:
+   with open(RAW_REDDIT_DATA_PATH, newline='', encoding='utf-8') as csvfile, open(PROCESSED_REDDIT_DATA_PATH, mode='w', encoding='utf-8') as csv_output_file:
      reader = csv.DictReader(csvfile)
      fieldnames = ['Date', 'Title', 'Post_Num', 'Avg_Upvote_Ratio', 'Keyword', 'Sentiment'] #todo: keyword and sentiment features
      writer = csv.DictWriter(csv_output_file, fieldnames=fieldnames)
@@ -51,14 +55,15 @@ def reddit_feature_extraction():
         date = row['created'].split()[0]
         title = row['title']
         upvote_ratio = row['upvote_ratio']
-        print(date, title)
+        #print(date, title)
         if (date == prev_date):
            document_list.append(title)
            post_count = post_count + 1
            upvote_radio_count = upvote_radio_count + float(upvote_ratio)
         else:
            keyword_features = keyword_feature(document_list)
-           writer.writerow({'Date': prev_date, 'Title': document_list, 'Post_Num': post_count, 'Avg_Upvote_Ratio': upvote_radio_count/post_count, 'Keyword': keyword_features, 'Sentiment': []})
+           sentiment_features = sentiment_feature(document_list)
+           writer.writerow({'Date': prev_date, 'Title': document_list, 'Post_Num': post_count, 'Avg_Upvote_Ratio': upvote_radio_count/post_count, 'Keyword': keyword_features, 'Sentiment': sentiment_features})
            post_count = 1
            upvote_radio_count = float(upvote_ratio)
            document_list = [title]
@@ -83,7 +88,7 @@ def preprocess_text(text):
 
 # function to count the top keywords generated from all reddit posts
 def keyword_count():
-   with open(RAW_REDDIT_DATA_PATH, newline='') as csvfile:
+   with open(RAW_REDDIT_DATA_PATH, newline='', encoding='utf-8') as csvfile:
      reader = csv.DictReader(csvfile)
      corpus = []
      for row in reader:
@@ -105,8 +110,18 @@ def keyword_count():
      
 #todo-2
 #input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
+#output is a 1*4 matrix with the sentiment score [compound, pos, neu, neg]
 def sentiment_feature(list_of_sentences):
-   return[]
+    text = " ".join(list_of_sentences)
+    tokens = nltk.word_tokenize(text)
+    tokens_without_sw = [token for token in tokens if token.lower() not in stopwords]
+    sia = SentimentIntensityAnalyzer()
+    txt = " ".join(tokens_without_sw)
+    print(txt)
+    sentiment_scores = sia.polarity_scores(txt)
+    output = [sentiment_scores['compound'], sentiment_scores['pos'], sentiment_scores['neu'], sentiment_scores['neg']]
+    print(output)
+    return output
 
 
 # function to integrate the processed stock dataset and reddit post dataset
