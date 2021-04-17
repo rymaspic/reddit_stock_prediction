@@ -1,4 +1,5 @@
 import csv
+import sys
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.feature_extraction.text import CountVectorizer
@@ -6,12 +7,17 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 import re
+from datetime import datetime as dt
+
+csv.field_size_limit(sys.maxsize)
 
 RAW_GME_STOCK_DATA_PATH = 'data/GME.csv'
 PROCESSED_GME_STOCK_DATA_PATH = 'data/GME_processed.csv'
 
 RAW_REDDIT_DATA_PATH = 'data/submissions_reddit.csv'
 PROCESSED_REDDIT_DATA_PATH = 'data/submissions_reddit_processed.csv'
+
+COMBO_DATA_PATH = 'data/combo.csv'
 
 def stock_preparation():
    # Data preparation for stock price
@@ -102,9 +108,42 @@ def keyword_count():
 def sentiment_feature(list_of_sentences):
    return[]
 
+
+# function to integrate the processed stock dataset and reddit post dataset
+def data_integration():
+   with open(PROCESSED_GME_STOCK_DATA_PATH, newline='') as gme, open(PROCESSED_REDDIT_DATA_PATH, newline='') as feature, open(COMBO_DATA_PATH, mode='w') as csv_output_file:
+      reader_gme = csv.DictReader(gme)
+      reader_feature = csv.DictReader(feature)
+      fieldnames = ['Date', 'Post_Num', 'Avg_Upvote_Ratio', 'Keyword', 'Sentiment', 'Label']
+      writer = csv.DictWriter(csv_output_file, fieldnames=fieldnames)
+      writer.writeheader()
+      stock_dict = {}
+      stock_date_list = []
+      for i in reader_gme:
+         date_time_obj = dt.strptime(i['Date'], '%Y-%m-%d')
+         print(date_time_obj)
+         print(i['Label'])
+         stock_dict[date_time_obj] = i['Label']
+         stock_date_list.append(date_time_obj)
+      
+      for row in reader_feature:
+         # the reddit post date
+         date = dt.strptime(row['Date'], '%Y-%m-%d')
+         # the relevant stock date
+         stock_date = min(stock_date_list, key=lambda d: abs(d - date))
+         print(date)
+         print("nearest stock market date",date)
+         date_string = str(date.year)+ "-" + str(date.month) + "-" + str(date.day)
+         print(date_string)
+         # choose the features that we decide to use
+         writer.writerow({'Date': date_string, 'Keyword': row['Keyword'], 'Post_Num': row['Post_Num'], 'Avg_Upvote_Ratio': row['Avg_Upvote_Ratio'], 'Sentiment': row['Sentiment'], 'Label': stock_dict[stock_date]})
+
+    
 def main():
     #keyword_count()
-    reddit_feature_extraction()
+    #reddit_feature_extraction()
+    stock_preparation()
+    data_integration()
 
 if __name__ == "__main__":
     main()
