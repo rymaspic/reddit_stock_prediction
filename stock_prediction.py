@@ -4,12 +4,16 @@ COMBO_DATA_PATH = 'data/combo.csv'
 from sklearn import datasets, neighbors, linear_model, svm
 import pandas as pd
 import re
+from sklearn.feature_selection import SelectKBest, chi2, f_classif
+from sklearn.model_selection import train_test_split
 
-def knn():
+def model():
     with open(COMBO_DATA_PATH, newline='', encoding='utf-8') as combo:
         reader = csv.DictReader(combo)
         X = []
         y = []
+        # Features: Post_Num, Avg_Upvote_Ratio, Keyword Counts, Sentiment Scores (12 columns)
+        # So far I include all columns from the combo.csv
         for row in reader:
             #determine what to include in the feature set
             feature = []
@@ -34,18 +38,21 @@ def knn():
             X.append(feature)
             y.append(int(row['Label']))
         
-        print(X[0])
+        #print(X[0])
         n_samples = len(X)
-        partition_ratio = 0.7 # percentage of the traning set
-        print(n_samples)  
-        X_train = X[:int(partition_ratio * n_samples)]
-        y_train = y[:int(partition_ratio * n_samples)]
-        X_test = X[int(partition_ratio * n_samples):]
-        y_test = y[int(partition_ratio * n_samples):]
 
-        knn = neighbors.KNeighborsClassifier(n_neighbors=9)
+        #feature selection
+        X = SelectKBest(k=8).fit_transform(X, y)
+        # print(X)
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=30)
+
+        # knn = neighbors.KNeighborsClassifier(n_neighbors=9)
+        for i in range(30):
+            knn = neighbors.KNeighborsClassifier(n_neighbors=i+1)
+            print('KNN score: %f' % knn.fit(X_train, y_train).score(X_test, y_test) + ' n = ' + str(i))
+        
         svm_clf = svm.SVC()
-        print('KNN score: %f' % knn.fit(X_train, y_train).score(X_test, y_test))
         print('SVM score: %f' % svm_clf.fit(X_train, y_train).score(X_test, y_test))
 
     
@@ -58,7 +65,7 @@ def test():
 
 def main():
     #test()
-    knn()
+    model()
 
 if __name__ == "__main__":
     main()
