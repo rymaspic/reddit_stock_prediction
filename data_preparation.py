@@ -7,6 +7,7 @@ from sklearn.pipeline import Pipeline
 import numpy as np
 import pandas as pd
 import re
+import matplotlib.pyplot as plt
 
 from datetime import datetime as dt
 
@@ -19,6 +20,7 @@ PROCESSED_GME_STOCK_DATA_PATH = 'data/GME_processed.csv'
 
 RAW_REDDIT_DATA_PATH = 'data/submissions_reddit.csv'
 PROCESSED_REDDIT_DATA_PATH = 'data/submissions_reddit_processed.csv'
+TEST_REDDIT_DATA_PATH = 'data/reddit_test.csv'
 
 COMBO_DATA_PATH = 'data/combo.csv'
 nltk.download([
@@ -111,14 +113,69 @@ def keyword_count():
      cv_fit = cv.fit_transform(corpus)
      counts = pd.DataFrame(cv_fit.toarray(),columns=cv.get_feature_names())
      counts = counts.sum()
-     print(counts.sort_values(ascending=False).head(0))
+     print(counts.sort_values(ascending=False).head(20))
      print("start tfidf analysis ...")
      tfIdfVectorizer = TfidfVectorizer(use_idf=True,lowercase=True, stop_words='english')
      tfIdf = tfIdfVectorizer.fit_transform(corpus)
      counts_tf = pd.DataFrame(tfIdf.toarray(),columns=tfIdfVectorizer.get_feature_names())
      counts_tf = counts_tf.sum()
-     print(counts_tf.sort_values(ascending=False).head(10))
-     
+     print(counts_tf.sort_values(ascending=False).head(20))
+
+def keyword_plot(date_start, date_end, n):
+   with open(TEST_REDDIT_DATA_PATH, newline='', encoding='utf-8') as csvfile:
+     reader = csv.DictReader(csvfile)
+     corpus = []
+     dt_start = dt.strptime(date_start, '%Y-%m-%d')
+     dt_end = dt.strptime(date_end, '%Y-%m-%d')
+     for row in reader:
+        date = dt.strptime(row['created'].split()[0], '%Y-%m-%d')
+         #   print(date)
+         #   print(dt_start)
+         #   print(dt_end)
+         #   print(date >= dt_start)
+        if ((date >= dt_start) and (date <= dt_end)):
+            corpus.append(row['title'])
+      
+     print("start term frequency analysis...")
+     cv = CountVectorizer(analyzer='word', lowercase=True, stop_words='english')
+     cv_fit = cv.fit_transform(corpus)
+     counts = pd.DataFrame(cv_fit.toarray(),columns=cv.get_feature_names())
+     counts = counts.sum()
+     counts = counts.sort_values(ascending=False).head(n)
+     print(counts)
+     print(counts.index.values)
+     x = counts.index.values
+     y = []
+     for i in x:
+        print(counts[i])
+        y.append(counts[i])
+     plt.figure()
+     plt.bar(x = x, height = y)
+     title = "Top-" + str(n) + " keyword count from "+date_start+" to "+date_end 
+     plt.title(title)
+     plt.savefig("keyword_count.jpg")
+     plt.close()
+
+     print("start tfidf analysis ...")
+     tfIdfVectorizer = TfidfVectorizer(use_idf=True,lowercase=True, stop_words='english')
+     tfIdf = tfIdfVectorizer.fit_transform(corpus)
+     counts_tf = pd.DataFrame(tfIdf.toarray(),columns=tfIdfVectorizer.get_feature_names())
+     counts_tf = counts_tf.sum()
+     counts_tf = counts_tf.sort_values(ascending=False).head(n)
+     print(counts_tf)
+
+     x = counts_tf.index.values
+     y = []
+     for i in x:
+        print(counts_tf[i])
+        y.append(counts_tf[i])
+     plt.figure()
+     plt.bar(x = x, height = y)
+     title = "Top-" + str(n) + " keyword using TF-IDF from "+date_start+" to "+date_end 
+     plt.title(title)
+     plt.savefig("Tfidf_count.jpg")
+     plt.close()
+
 #todo-2
 #input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
 #output is a 1*4 matrix with the sentiment score [compound, pos, neu, neg]
@@ -128,7 +185,7 @@ def sentiment_feature(list_of_sentences):
     tokens_without_sw = [token for token in tokens if token.lower() not in stopwords]
     sia = SentimentIntensityAnalyzer()
     txt = " ".join(tokens_without_sw)
-    print(txt)
+    #print(txt)
     sentiment_scores = sia.polarity_scores(txt)
     output = [sentiment_scores['compound'], sentiment_scores['pos'], sentiment_scores['neu'], sentiment_scores['neg']]
     print(output)
@@ -166,10 +223,10 @@ def data_integration():
 
     
 def main():
-    keyword_count()
+    #keyword_plot("2021-01-01", "2021-01-21", 10)
     #reddit_feature_extraction()
     #stock_preparation()
-    #data_integration()
+    data_integration()
 
 if __name__ == "__main__":
     main()
