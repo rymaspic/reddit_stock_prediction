@@ -153,7 +153,7 @@ def keyword_plot(date_start, date_end, n):
      plt.bar(x = x, height = y)
      title = "Top-" + str(n) + " keyword count from "+date_start+" to "+date_end 
      plt.title(title)
-     plt.savefig("keyword_count.jpg")
+     plt.savefig("img/keyword_count.jpg")
      plt.close()
 
      print("start tfidf analysis ...")
@@ -173,7 +173,7 @@ def keyword_plot(date_start, date_end, n):
      plt.bar(x = x, height = y)
      title = "Top-" + str(n) + " keyword using TF-IDF from "+date_start+" to "+date_end 
      plt.title(title)
-     plt.savefig("Tfidf_count.jpg")
+     plt.savefig("img/Tfidf_count.jpg")
      plt.close()
 
 #todo-2
@@ -223,10 +223,10 @@ def data_integration():
 
     
 def main():
-    #keyword_plot("2021-01-01", "2021-01-21", 10)
+    keyword_plot("2021-01-22", "2021-02-01", 10)
     #reddit_feature_extraction()
     #stock_preparation()
-    data_integration()
+    #data_integration()
 
 if __name__ == "__main__":
     main()

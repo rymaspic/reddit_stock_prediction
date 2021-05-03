@@ -74,21 +74,21 @@ def model():
         plot_confusion_matrix(rfc, X_test, y_test)  
         # plt.show()
         plt.title("Random Forest Confusion Matrix")
-        plt.savefig("rf_cm.jpg")
+        plt.savefig("img/rf_cm.jpg")
         plt.close()
 
         plt.figure()
         plot_confusion_matrix(lr, X_test, y_test)  
         # plt.show()
         plt.title("Logistic Regression Confusion Matrix")
-        plt.savefig("lr_cm.jpg")
+        plt.savefig("img/lr_cm.jpg")
         plt.close()
 
         plt.figure()
         plot_confusion_matrix(knn, X_test, y_test)  
         # plt.show()
         plt.title("KNN Confusion Matrix")
-        plt.savefig("knn_cm.jpg")
+        plt.savefig("img/knn_cm.jpg")
         plt.close()
 
         #knn = neighbors.KNeighborsClassifier(n_neighbors=11)
@@ -106,7 +106,7 @@ def eval(clf, X, y):
     plt.figure()
     plot_roc_curve(clf, X_test, y_test)
     plt.title(str(clf) + " ROC")
-    plt.savefig(str(clf) + "_roc.jpg")
+    plt.savefig("img/" + str(clf) + "_roc.jpg")
     plt.close()
 
 
