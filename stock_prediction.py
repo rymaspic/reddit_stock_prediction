@@ -38,11 +38,11 @@ def model():
         
             sentiment = row['Sentiment']
             sentiment = sentiment.strip("[]")
-            print(sentiment.split(', '))
+            #print(sentiment.split(', '))
             for i in sentiment.split(', '):
                 # if (i.isdigit()):
                     feature.append(float(i))
-            print(feature)
+            #print(feature)
 
             X.append(feature)
             y.append(int(row['Label']))
@@ -59,14 +59,16 @@ def model():
         #     knn = neighbors.KNeighborsClassifier(n_neighbors=i+1)
         #     print('KNN score: %f' % knn.fit(X_train, y_train).score(X_test, y_test) + ' n = ' + str(i+1))
 
-        knn = neighbors.KNeighborsClassifier(n_neighbors=12)
-        print('KNN score: %f' % knn.fit(X_train, y_train).score(X_test, y_test) + ' n = 12')
+        print("--------------Prediction scores using all features--------------------")
 
         lr = LogisticRegression(random_state=30)
-        print('Linear regression score: %f' % lr.fit(X_train, y_train).score(X_test, y_test))
+        print(str(lr) + ' score: %f' % lr.fit(X_train, y_train).score(X_test, y_test))
         
         rfc = RandomForestClassifier(random_state=30)
-        print('Random Forest score: %f' % rfc.fit(X_train, y_train).score(X_test, y_test))
+        print(str(rfc) + ' score: %f' % rfc.fit(X_train, y_train).score(X_test, y_test))
+
+        knn = neighbors.KNeighborsClassifier(n_neighbors=12)
+        print(str(knn) + ' score: %f' % knn.fit(X_train, y_train).score(X_test, y_test))
         
         # svm_clf = svm.SVC()
         # print('SVM score: %f' % svm_clf.fit(X_train, y_train).score(X_test, y_test))
@@ -91,22 +93,43 @@ def model():
         plt.savefig("img/knn_cm.jpg")
         plt.close()
 
-        #knn = neighbors.KNeighborsClassifier(n_neighbors=11)
         #eval(knn, X, y), knn is not suitable for SelectFromModel
+        print("--------------Prediction scores after feature selection---------------")
         eval(lr, X, y)
         eval(rfc, X, y)
+
+        # Knn cannot use the SelectFromModel in the eval() function
+        X = SelectKBest(k=10).fit_transform(X, y)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=30)
+        print(str(knn) + ' score: %f' % knn.fit(X_train, y_train).score(X_test, y_test))
+        plt.figure()
+        plot_roc_curve(knn, X_test, y_test)
+        plt.title(str(knn).split("(")[0] + " ROC")
+        plt.savefig("img/" + str(knn) + "_roc.jpg")
+        plt.close()
+        cm(knn, X_test, y_test)
 
 def eval(clf, X, y):
     model = SelectFromModel(clf, prefit=True)
     X = model.transform(X)
-    print(X)
+    #print(X)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=30)
     # score = cross_val_score(clf, X, y, cv=5)
     print(str(clf) + ' score: %f' % clf.fit(X_train, y_train).score(X_test, y_test))
     plt.figure()
     plot_roc_curve(clf, X_test, y_test)
-    plt.title(str(clf) + " ROC")
+    plt.title(str(clf).split("(")[0] + " ROC")
     plt.savefig("img/" + str(clf) + "_roc.jpg")
+    plt.close()
+    cm(clf, X_test, y_test)
+
+
+def cm(clf, X_test, y_test):
+    plt.figure()
+    plot_confusion_matrix(clf, X_test, y_test)  
+    # plt.show()
+    plt.title(str(clf).split("(")[0] + " Confusion Matrix")
+    plt.savefig("img/" + str(clf) + "_cm.jpg")
     plt.close()
 
 

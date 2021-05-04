@@ -122,7 +122,7 @@ def keyword_count():
      print(counts_tf.sort_values(ascending=False).head(20))
 
 def keyword_plot(date_start, date_end, n):
-   with open(TEST_REDDIT_DATA_PATH, newline='', encoding='utf-8') as csvfile:
+   with open(RAW_REDDIT_DATA_PATH, newline='', encoding='utf-8') as csvfile:
      reader = csv.DictReader(csvfile)
      corpus = []
      dt_start = dt.strptime(date_start, '%Y-%m-%d')
@@ -223,7 +223,7 @@ def data_integration():
 
     
 def main():
-    keyword_plot("2021-01-22", "2021-02-01", 10)
+    keyword_plot("2021-01-01", "2021-03-31", 10)
     #reddit_feature_extraction()
     #stock_preparation()
     #data_integration()
