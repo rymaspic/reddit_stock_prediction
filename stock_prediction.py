@@ -109,6 +109,7 @@ def model():
         plt.close()
         cm(knn, X_test, y_test)
 
+#Draw the 
 def eval(clf, X, y):
     model = SelectFromModel(clf, prefit=True)
     X = model.transform(X)

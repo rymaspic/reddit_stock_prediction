@@ -35,7 +35,6 @@ nltk.download([
 ])
 stopwords = nltk.corpus.stopwords.words("english")
 
-
 def stock_preparation():
    # Data preparation for stock price
    with open(RAW_GME_STOCK_DATA_PATH, newline='') as csvfile, open(PROCESSED_GME_STOCK_DATA_PATH, mode='w') as csv_output_file:
@@ -82,7 +81,6 @@ def reddit_feature_extraction():
            document_list = [title]
            prev_date = date
 
-#todo-1
 # input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
 # output a 1*n matrix with the count of frequency of the target words each day. eg. [0, 1, 2, 0, 0, 0, 1]
 def keyword_feature(list_of_sentences):
@@ -121,6 +119,7 @@ def keyword_count():
      counts_tf = counts_tf.sum()
      print(counts_tf.sort_values(ascending=False).head(20))
 
+#funtion to plot the top keywords of the given time period
 def keyword_plot(date_start, date_end, n):
    with open(RAW_REDDIT_DATA_PATH, newline='', encoding='utf-8') as csvfile:
      reader = csv.DictReader(csvfile)
@@ -176,7 +175,6 @@ def keyword_plot(date_start, date_end, n):
      plt.savefig("img/Tfidf_count.jpg")
      plt.close()
 
-#todo-2
 #input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
 #output is a 1*4 matrix with the sentiment score [compound, pos, neu, neg]
 def sentiment_feature(list_of_sentences):
@@ -223,10 +221,14 @@ def data_integration():
 
     
 def main():
-    keyword_plot("2021-01-01", "2021-03-31", 10)
-    #reddit_feature_extraction()
-    #stock_preparation()
+    #step1: preprocessing the stock price dataset, input dataset name:"GME.csv", output dataset name: "GME_processed.csv"
+    stock_preparation()
+    #step2: extract the features from the reddit dataset, input dataset name: "submissions_reddit.csv", output dataset name: "submissions_reddit_processed.csv"
+    reddit_feature_extraction()
+    #step3: integrate the two dataset into one which can be used for model training, output dataset name: "combo.csv"
     #data_integration()
+    #descriptive analysis: plot the keywords in a given time period
+    #keyword_plot("2021-01-01", "2021-03-31", 10)
 
 if __name__ == "__main__":
     main()
