@@ -3,10 +3,8 @@ This is the final project for NYU Big Data Science course 2021 Spring.
 # First Steps
 1. Git clone this repository
 2. Download the datasets: stock and reddit posts.
-3. Create your own python virtual envioronment and install required packages
-   ([VENV](https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/),
+3. Install required packages using pip or conda
    [Install Packages](https://pip.pypa.io/en/latest/user_guide/#requirements-files))
-> python -m pip install -r requirements.txt
 
 # Stock Market Prediction Using the Reddit Post Dataset
 1. Put the data files under data/ folder
