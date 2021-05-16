@@ -3,6 +3,7 @@ import csv
 from datetime import datetime
 import matplotlib.dates as mdates
 
+# plot GME stock price
 def plotStockSummary(filename, savepath):
     file = open(filename)
     reader = csv.DictReader(file)
@@ -25,6 +26,7 @@ def plotStockSummary(filename, savepath):
     plt.savefig(savepath)
     plt.show()
 
+# plot GME reddit post number and sentiment scores
 def plotMetrics(filename):
     file = open(filename)
     reader = csv.DictReader(file)
@@ -33,11 +35,16 @@ def plotMetrics(filename):
     dates = []
     for row in reader:
         print (row)
-        dates.append(datetime.strptime(row['Date'], "%Y-%m-%d"))
-        post_number.append(int(row['Post_Num']))
-        compound = float(row['Sentiment'][1:-1].split()[0][:-1])
-        sentiments.append(compound)
+        try:
+            dates.append(datetime.strptime(row['Date'], "%d/%m/%Y"))
+            post_number.append(int(row['Post_Num']))
+            compound = float(row['Sentiment'][1:-1].split()[0][:-1])
+            sentiments.append(compound)
+        except Exception as e:
+            print (e)
 
+    print(sentiments)
+    print(post_number)
     # post number picture
     plt.plot(dates, post_number)
     ax = plt.gca()
@@ -47,7 +54,7 @@ def plotMetrics(filename):
     plt.xlabel("time")
     plt.ylabel("post number")
     plt.title("GME Reddit Post Number")
-    plt.savefig("GME_post_number.jpg")
+    plt.savefig("data/GME_post_number.png")
     plt.show()
 
     plt.plot(dates, sentiments)
@@ -58,14 +65,16 @@ def plotMetrics(filename):
     plt.xlabel("time")
     plt.ylabel("sentiment")
     plt.title("GME Reddit Sentiments")
-    plt.savefig("GME_news_sentiments.jpg")
+    plt.savefig("data/GME_news_sentiments.png")
     plt.show()
+
 def main():
     GME_3_month = "data/GME.csv"
     GME_1_year = "data/GME_1.csv"
     combo = "data/combo.csv"
-    plotStockSummary(GME_3_month,"GME_3_month.png")
-    plotStockSummary(GME_1_year,"GME_1_year.png")
+    plotStockSummary(GME_3_month,"data/GME_3_month.png")
+    plotStockSummary(GME_1_year,"data/GME_1_year.png")
     plotMetrics(combo)
+
 if __name__ == "__main__":
     main()

@@ -26,9 +26,6 @@ COMBO_DATA_PATH = 'data/combo.csv'
 nltk.download([
      "names",
      "stopwords",
-     "state_union",
-     "twitter_samples",
-     "movie_reviews",
      "averaged_perceptron_tagger",
      "punkt",
      'vader_lexicon',
@@ -177,13 +174,13 @@ def keyword_plot(date_start, date_end, n):
 
 #input is a the document_list object, a list of string. eg. ['gme to the moon', 'buy and hold', 'lets go gme gang 🚀']
 #output is a 1*4 matrix with the sentiment score [compound, pos, neu, neg]
+#if compound value > 0, it means positive
 def sentiment_feature(list_of_sentences):
     text = " ".join(list_of_sentences)
     tokens = nltk.word_tokenize(text)
     tokens_without_sw = [token for token in tokens if token.lower() not in stopwords]
     sia = SentimentIntensityAnalyzer()
     txt = " ".join(tokens_without_sw)
-    #print(txt)
     sentiment_scores = sia.polarity_scores(txt)
     output = [sentiment_scores['compound'], sentiment_scores['pos'], sentiment_scores['neu'], sentiment_scores['neg']]
     print(output)
