@@ -67,11 +67,11 @@ def trainModel(GME_3_month, GME_1_year):
     fig, ax = plt.subplots(2, 1)
     residuals.plot(title="Residuals", ax=ax[0])
     residuals.plot(kind='kde', title='Density', ax=ax[1])
-    plt.savefig("data/GME_3_month_residuals.png")
+    plt.savefig("img/GME_3_month_residuals.png")
     plt.show()
     # Actual vs Fitted
     model_fit.plot_predict(dynamic=False)
-    plt.savefig("data/GME_3_month_fit.png")
+    plt.savefig("img/GME_3_month_fit.png")
     plt.show()
 
     index = int(len(df_3_month.Close) * 0.95)
@@ -104,11 +104,11 @@ def trainModel(GME_3_month, GME_1_year):
     fig, ax = plt.subplots(2, 1)
     residuals.plot(title="Residuals", ax=ax[0])
     residuals.plot(kind='kde', title='Density', ax=ax[1])
-    plt.savefig("data/GME_1_year_residuals.png")
+    plt.savefig("img/GME_1_year_residuals.png")
     plt.show()
     # Actual vs Fitted
     model_fit.plot_predict(dynamic=False)
-    plt.savefig("data/GME_1_year_fit.png")
+    plt.savefig("img/GME_1_year_fit.png")
     plt.show()
 
     index = int(len(df_1_year.Close) * 0.95)
@@ -146,8 +146,8 @@ def prediction(train, test, p, d, q, savepath):
 def main():
     GME_3_month = "data/GME.csv"
     GME_1_year = "data/GME_1.csv"
-    plotMetrics(GME_3_month, "data/GME_3_month")
-    plotMetrics(GME_1_year, "data/GME_1_year")
+    plotMetrics(GME_3_month, "img/GME_3_month")
+    plotMetrics(GME_1_year, "img/GME_1_year")
     trainModel(GME_3_month,GME_1_year)
 
 if __name__ == "__main__":

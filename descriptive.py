@@ -36,7 +36,7 @@ def plotMetrics(filename):
     for row in reader:
         print (row)
         try:
-            dates.append(datetime.strptime(row['Date'], "%d/%m/%Y"))
+            dates.append(datetime.strptime(row['Date'], "%Y-%m-%d"))
             post_number.append(int(row['Post_Num']))
             compound = float(row['Sentiment'][1:-1].split()[0][:-1])
             sentiments.append(compound)
@@ -54,7 +54,7 @@ def plotMetrics(filename):
     plt.xlabel("time")
     plt.ylabel("post number")
     plt.title("GME Reddit Post Number")
-    plt.savefig("data/GME_post_number.png")
+    plt.savefig("img/GME_post_number.png")
     plt.show()
 
     plt.plot(dates, sentiments)
@@ -65,15 +65,15 @@ def plotMetrics(filename):
     plt.xlabel("time")
     plt.ylabel("sentiment")
     plt.title("GME Reddit Sentiments")
-    plt.savefig("data/GME_news_sentiments.png")
+    plt.savefig("img/GME_news_sentiments.png")
     plt.show()
 
 def main():
     GME_3_month = "data/GME.csv"
     GME_1_year = "data/GME_1.csv"
     combo = "data/combo.csv"
-    plotStockSummary(GME_3_month,"data/GME_3_month.png")
-    plotStockSummary(GME_1_year,"data/GME_1_year.png")
+    plotStockSummary(GME_3_month,"img/GME_3_month.png")
+    plotStockSummary(GME_1_year,"img/GME_1_year.png")
     plotMetrics(combo)
 
 if __name__ == "__main__":
