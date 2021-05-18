@@ -78,7 +78,7 @@ def trainModel(GME_3_month, GME_1_year):
 
     train = df_3_month.Close[:index]
     test = df_3_month.Close[index:]
-    prediction(train,test, 1, 1, 0, "GME_3_month_prediction.png")
+    prediction(train,test, 1, 1, 0, "img/GME_3_month_prediction.png")
 
     # GME 1 year
     auto_model = pm.auto_arima(df_1_year.Close, start_p=1, start_q=1,
@@ -115,7 +115,7 @@ def trainModel(GME_3_month, GME_1_year):
 
     train = df_1_year.Close[:index]
     test = df_1_year.Close[index:]
-    prediction(train,test, 5, 1, 0, "GME_1_year_prediction.png")
+    prediction(train,test, 5, 1, 0, "img/GME_1_year_prediction.png")
 
 # test ARIMA model on the testing dataset
 def prediction(train, test, p, d, q, savepath):
